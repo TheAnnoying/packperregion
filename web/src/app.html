@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<link rel="icon" href="%sveltekit.assets%/favicon.png" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<style>
+			@import url("https://fonts.googleapis.com/css2?family=Noto+Sans:ital,wght@0,100..900;1,100..900&display=swap");
+
+			body {
+				font-family: ui-sans-serif, system-ui, sans-serif;
+        		background-color: rgb(62, 133, 44);
+				justify-content: center;
+				flex-direction: column;
+				align-items: center;
+				text-align: center;
+				color: white;
+				display: flex;
+				height: 100vh;
+				margin: 0;
+    		}
+
+			@font-face {
+				font-family: "minecraft-ten";
+				src: url("/minecraft-ten-lowercase.ttf");
+			}
+
+			h1 {
+				font-size: 40px;
+				letter-spacing: 2px;
+				font-family: "minecraft-ten";
+				text-transform: uppercase;
+				margin: 0;
+			}
+
+			#content {
+				margin-top: 40px;
+				width: 80%;
+				display: flex;
+				justify-content: center;
+				align-items: center;
+				flex-direction: column;
+				position: relative;
+				padding: 20px;
+				background-color: rgb(237, 229, 226);
+				text-align: center;
+				box-shadow: 0 5px 0 #0006;
+			}
+
+			p {
+				padding: 7px 0 7px 0;
+				font-family: "minecraft-ten";
+				font-size: 1.5rem;
+				position: absolute;
+				top: 0;
+				width: 100%;
+				background-color: rgb(208, 197, 192);
+				border-bottom: 2px solid rgb(166, 158, 154);
+				margin: 0;
+				color: rgb(38, 36, 35);
+			}
+
+			span {
+				text-decoration: underline;
+			}
+
+			button {
+				box-shadow:
+					inset 0 4px 0 rgb(84, 165, 59),
+					inset 0 -4px 0 rgb(44, 100, 32);
+				background-color: rgb(62, 133, 44);
+				outline: 2px solid rgb(38, 36, 35);
+				text-transform: uppercase;
+				font-family: "Noto Sans";
+				padding: 15px 28px;
+				user-select: none;
+				font-weight: 800;
+				margin-top: 20px;
+				font-size: 18px;
+				color: white;
+				border: 0;
+			}
+
+			button.disabled {
+				filter: grayscale(1);
+				pointer-events: none;
+			}
+
+			button:focus-visible {
+				outline: 2px solid white;
+			}
+
+			button:active {
+				background-color: rgb(56, 119, 40);
+				outline: 2px solid white;
+				box-shadow: unset;
+			}
+
+			button:hover {
+				background-color: rgb(56, 119, 40);
+			}
+
+			input {
+				margin-top: 48px;
+				color: rgb(38, 36, 35);
+				font-size: 16px;
+			}
+
+			input::file-selector-button {
+				box-shadow:
+					inset 0 4px 0 rgb(237, 229, 226),
+					inset 0 -4px 0 rgb(171, 160, 156);
+				background-color: rgb(208, 197, 192);
+				font-size: 18px;
+				padding: 8px 28px;
+			}
+
+			.error {
+				color: rgb(150, 0, 0);
+				text-decoration: none;
+    		}
+
+			@media (min-width: 768px) {
+				#content {
+					width: 40%;
+				}
+			}
+		</style>
+		%sveltekit.head%
+	</head>
+	<body data-sveltekit-preload-data="hover">
+		<div style="display: contents">%sveltekit.body%</div>
+	</body>
+</html>

@@ -1,0 +1,39 @@
+messages:
+  player_required: "&cA player is required to run this command!"
+  config_reloaded: "&aSuccessfully reloaded the config"
+  error_occurred: "&cAn unknown error occurred! Sorry!"
+
+  # RegisterArea command messages
+  not_enough_coordinates_specified: "&cYou did not mention all the coordinates"
+  coordinates_must_be_numbers: "&cAll coordinates provided must be numbers"
+  no_coordinates_specified: "&cYou must input the two coordinates that will be the area that the resource pack will be applied in"
+  pack_uploaded_success: "&aYour resource pack was uploaded successfully and is ready to be reviewed!"
+  pack_upload_timeout: "&cYou took too long to upload a resource pack! Run the command again if you'd like to upload one anyway."
+
+  # PackPerRegion command messages
+  send_pack_list: "&dBy: &r[PLAYER]\n&cStatus: &r[STATUS]\n Pack URL"
+  no_pack_found: "&cNo resource pack matches the token you provided! Use &7/packperregion packlist&c to view all packs."
+  no_packs: "&cNo regions were defined! Try creating a region using &7/registerarea&c!"
+  no_token_provided: "&cYou must provide a pack token! Use &7/packperregion packlist&c to view all packs."
+  pack_delete_success: "&aThe pack has been rejected/deleted successfully!"
+  pack_delete_error: "&An error occurred on Pack Per Region's server whilst deleting the pack. This is most likely safe to ignore."
+  pack_accept_success: "&aThe pack was accepted successfully!"
+  pack_accept_already_accepted: "&cThis pack is already approved!"
+
+  # Links
+  pack_upload_site: "&7Press on the following link in order to upload the resource pack zip"
+  pressable_link_text: "&e[PRESS HERE]"
+  link_hover: "&7&oClick to open the pack upload page"
+
+
+  # Packlist command messages
+  # Use #pack_owner #pack_status #pack_name #pack_url #pack_coordinates in the message for the actual data to display
+  packlist_command_response: "&7&m--------------------\n&aName: &f#pack_name\n&aUploaded By: &f#pack_owner\n&aPack Status: &f#pack_status\n&aRegion Coordinates: &f#pack_coordinates\n&aToken: &f#pack_token\n&aPack URL: &f#pack_url\n&7&m--------------------"
+  packlist_command_open_url: "&a[OPEN LINK]"
+
+settings:
+  # Will allow players to reject a region's resource pack
+  make_region_packs_optional: false
+  # Players might disable the server resource pack and region specific resource packs will not work, choose whether to send them a warning about it
+  send_warning_on_region_enter: true
+  send_warning_on_join: false
