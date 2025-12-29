@@ -21,14 +21,14 @@ public class EnterRegion implements Listener {
 			if (pack.getAsJsonObject().get("pack_status").getAsString().equals("Accepted")) {
 				JsonArray coordArray = pack.getAsJsonObject().get("coordinates").getAsJsonArray();
 				boolean isWithinRegion = isWithinRegion(coordArray.get(0).getAsJsonArray(), coordArray.get(1).getAsJsonArray(), playerLocation);
-				String token = pack.getAsJsonObject().get("token").getAsString();
+				String id = pack.getAsJsonObject().get("id").getAsString();
 
-				if (!token.equals(regionEntered.get(player.getUniqueId())) && isWithinRegion) {
-					regionEntered.put(player.getUniqueId(), token);
-					player.addResourcePack(UUID.fromString(pack.getAsJsonObject().get("token").getAsString()), pack.getAsJsonObject().get("pack_url").getAsString(), null, null, getConfigBool("settings.make_region_packs_optional"));
-				} else if(token.equals(regionEntered.get(player.getUniqueId())) && !isWithinRegion) {
+				if (!id.equals(regionEntered.get(player.getUniqueId())) && isWithinRegion) {
+					regionEntered.put(player.getUniqueId(), id);
+					player.addResourcePack(UUID.fromString(pack.getAsJsonObject().get("id").getAsString()), pack.getAsJsonObject().get("pack_url").getAsString(), null, null, getConfigBool("settings.make_region_packs_optional"));
+				} else if(id.equals(regionEntered.get(player.getUniqueId())) && !isWithinRegion) {
 					regionEntered.remove(player.getUniqueId());
-					player.removeResourcePack(UUID.fromString(pack.getAsJsonObject().get("token").getAsString()));
+					player.removeResourcePack(UUID.fromString(pack.getAsJsonObject().get("id").getAsString()));
 				}
 			}
 		});

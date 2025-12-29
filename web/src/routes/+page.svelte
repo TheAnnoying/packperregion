@@ -16,7 +16,7 @@
         const formData = new FormData();
         formData.append("pack", file);
 
-        const res = await fetch(`${import.meta.env.VITE_API_URL}/uploadpack?token=${$page?.data?.token}`, {
+        const res = await fetch(`${import.meta.env.VITE_API_URL}/uploadpack?id=${$page?.data?.id}`, {
             method: "POST",
             body: formData
         }).then(e => e.json()).catch(e => setError(e));
@@ -27,10 +27,10 @@
 <svelte:head>
     <title>Pack Per Region Uploader</title>
 </svelte:head>
-{#if $page?.data?.uuid && $page?.data?.token}
+{#if $page?.data?.uuid && $page?.data?.id}
     <h1>Upload Resource Pack</h1>
     <div id="content">
-        <p>Uploading as 
+        <p>Uploading as
             {#await fetch(`https://playerdb.co/api/player/minecraft/${$page?.data?.uuid}`).then(e => e.json())}
                 <span>...</span>
             {:then res}

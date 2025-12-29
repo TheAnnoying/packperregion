@@ -1,7 +1,7 @@
 name: PackPerRegion
 version: '${project.version}'
 main: me.theannoying.packperregion.PackPerRegion
-api-version: '1.20'
+api-version: '1.21'
 authors: [ TheAnnoying ]
 description: Pack Per Region is a plugin that allows server players to register regions in which a resource pack will be applied
 log-prefix: PackPerRegion
@@ -13,6 +13,6 @@ commands:
   packperregion:
     aliases: [ ppr ]
     description: Reload the plugin, view current pack requests, reject and accept pack requests
-    usage: /packperregion <reload/packlist/accept/reject-or-delete>
+    usage: /packperregion <reload/list/accept/reject-or-delete>
     permission: packperregion.manage
     permission-message: You don't have permission to use this command!

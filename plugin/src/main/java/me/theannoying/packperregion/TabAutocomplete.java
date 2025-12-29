@@ -19,7 +19,7 @@ public class TabAutocomplete implements TabCompleter {
 		if(command.getName().equalsIgnoreCase("packperregion")) {
 			if(args.length == 1) {
 				suggestions.add("reload");
-				suggestions.add("packlist");
+				suggestions.add("list");
 				suggestions.add("accept");
 				suggestions.add("reject-or-delete");
 			}
@@ -28,11 +28,11 @@ public class TabAutocomplete implements TabCompleter {
 				if(args[0].equals("accept")) {
 					packList.forEach(element -> {
 						if(!"Accepted".equals(element.getAsJsonObject().get("pack_status").getAsString())) {
-							suggestions.add(element.getAsJsonObject().get("token").getAsString());
+							suggestions.add(element.getAsJsonObject().get("id").getAsString());
 						}
 					});
 				} else if(args[0].equals("reject-or-delete")) {
-					packList.forEach(element -> suggestions.add(element.getAsJsonObject().get("token").getAsString()));
+					packList.forEach(element -> suggestions.add(element.getAsJsonObject().get("id").getAsString()));
 				}
 			}
 		}

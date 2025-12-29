@@ -12,9 +12,9 @@ messages:
 
   # PackPerRegion command messages
   send_pack_list: "&dBy: &r[PLAYER]\n&cStatus: &r[STATUS]\n Pack URL"
-  no_pack_found: "&cNo resource pack matches the token you provided! Use &7/packperregion packlist&c to view all packs."
+  no_pack_found: "&cNo resource pack matches the ID you provided! Use &7/packperregion packlist&c to view all packs."
   no_packs: "&cNo regions were defined! Try creating a region using &7/registerarea&c!"
-  no_token_provided: "&cYou must provide a pack token! Use &7/packperregion packlist&c to view all packs."
+  no_id_provided: "&cYou must provide a pack ID! Use &7/packperregion packlist&c to view all packs."
   pack_delete_success: "&aThe pack has been rejected/deleted successfully!"
   pack_delete_error: "&An error occurred on Pack Per Region's server whilst deleting the pack. This is most likely safe to ignore."
   pack_accept_success: "&aThe pack was accepted successfully!"
@@ -28,12 +28,12 @@ messages:
 
   # Packlist command messages
   # Use #pack_owner #pack_status #pack_name #pack_url #pack_coordinates in the message for the actual data to display
-  packlist_command_response: "&7&m--------------------\n&aName: &f#pack_name\n&aUploaded By: &f#pack_owner\n&aPack Status: &f#pack_status\n&aRegion Coordinates: &f#pack_coordinates\n&aToken: &f#pack_token\n&aPack URL: &f#pack_url\n&7&m--------------------"
+  packlist_command_response: "&7&m--------------------\n&aName: &f#pack_name\n&aUploaded By: &f#pack_owner\n&aPack Status: &f#pack_status\n&aRegion Coordinates: &f#pack_coordinates\n&aID: &f#pack_id\n&aPack URL: &f#pack_url\n&7&m--------------------"
   packlist_command_open_url: "&a[OPEN LINK]"
 
 settings:
-  # Will allow players to reject a region's resource pack
-  make_region_packs_optional: false
+  # Will not allow players to reject a region's resource pack
+  make_region_packs_required: false
   # Players might disable the server resource pack and region specific resource packs will not work, choose whether to send them a warning about it
   send_warning_on_region_enter: true
   send_warning_on_join: false

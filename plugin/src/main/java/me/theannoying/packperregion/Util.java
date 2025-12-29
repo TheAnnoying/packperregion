@@ -94,11 +94,11 @@ public class Util {
 		return getJsonArray(path);
 	}
 
-	public static int getPackIndexBasedOffToken(JsonArray packList, String token) {
+	public static int getPackIndexBasedOffID(JsonArray packList, String id) {
 		int packIndex = -1;
 		for (int i = 0; i < packList.size(); i++) {
 			JsonObject packObject = packList.get(i).getAsJsonObject();
-			if (packObject.get("token").getAsString().equals(token)) packIndex = i;
+			if (packObject.get("id").getAsString().equals(id)) packIndex = i;
 		}
 		return packIndex;
 	}
