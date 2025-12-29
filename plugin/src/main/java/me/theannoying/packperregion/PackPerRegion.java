@@ -7,13 +7,20 @@ public final class PackPerRegion extends JavaPlugin {
 	public static PackPerRegion getPlugin() { return plugin; }
 	public final FileConfiguration config = getConfig();
 
+    public static String packDirectory;
+    public static String packListPath;
+
 	@Override
 	public void onEnable() {
 		saveDefaultConfig();
 		saveResource("packs/list.json", false);
 
-		plugin = this;
-		getServer().getLogger().info("Enabling...");
+        plugin = this;
+        packDirectory = getPlugin().getDataFolder().getAbsolutePath() + "/packs/";
+        packListPath = packDirectory + "list.json";
+
+        PackServer.startServer(8080);
+        getServer().getLogger().info("Enabling...");
 
 		getCommand("registerarea").setExecutor(new Commands());
 		getCommand("packperregion").setExecutor(new Commands());

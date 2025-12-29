@@ -14,17 +14,19 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitTask;
 
+import java.io.File;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
 import static me.theannoying.packperregion.EnterRegion.getRegionEntered;
 import static me.theannoying.packperregion.PackPerRegion.getPlugin;
+import static me.theannoying.packperregion.PackPerRegion.packDirectory;
+import static me.theannoying.packperregion.PackPerRegion.packListPath;
 import static me.theannoying.packperregion.Util.*;
 
 public class Commands implements CommandExecutor {
-	final String packListPath = getPlugin().getDataFolder().getAbsolutePath() + "/packs/list.json";
-	final String serverURL = "http://localhost:8080/";
+	private final String serverURL = "http://localhost:8080/";
 	AtomicInteger taskCounter = new AtomicInteger();
 	final int PERIOD = 100;
 	final int TIMEOUT = 60 * PERIOD;
@@ -44,49 +46,46 @@ public class Commands implements CommandExecutor {
 			} else if (args.length != 6) {
 				sender.sendMessage(ChatColor.translateAlternateColorCodes('&', getConfigString("messages.not_enough_coordinates_specified")));
 			} else {
-				JsonObject authToken = new HttpRequest(serverURL + "gettoken?uuid=" + ((Player) sender).getUniqueId(), "GET").execute(sender);
-				if (authToken != null) {
-					TextComponent component = new TextComponent(ChatColor.translateAlternateColorCodes('&', getConfigString("messages.pressable_link_text")));
+				String id = UUID.randomUUID().toString();
+                TextComponent component = new TextComponent(ChatColor.translateAlternateColorCodes('&', getConfigString("messages.pressable_link_text")));
 
-					component.setClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, "http://localhost:5173/" + "?uuid=" + ((Player) sender).getUniqueId() + "&token=" + authToken.get("token").getAsString()));
-					component.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new Text(ChatColor.translateAlternateColorCodes('&', getConfigString("messages.link_hover")))));
+                component.setClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, "http://localhost:5173/" + "?uuid=" + ((Player) sender).getUniqueId() + "&id=" + id));
+                component.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new Text(ChatColor.translateAlternateColorCodes('&', getConfigString("messages.link_hover")))));
 
-					sender.sendMessage(ChatColor.translateAlternateColorCodes('&', getConfigString("messages.pack_upload_site")));
-					sender.spigot().sendMessage(component);
+                sender.sendMessage(ChatColor.translateAlternateColorCodes('&', getConfigString("messages.pack_upload_site")));
+                sender.spigot().sendMessage(component);
 
-					AtomicReference<BukkitTask> timer = new AtomicReference<>();
-					timer.set(Bukkit.getScheduler().runTaskTimer(getPlugin(), () -> {
-						JsonObject packData = new HttpRequest(serverURL + "getpackdata?token=" + authToken.get("token").getAsString(), "GET").execute(sender);
-						JsonElement packName = packData.get("pack_name");
+                AtomicReference<BukkitTask> timer = new AtomicReference<>();
+                timer.set(Bukkit.getScheduler().runTaskTimer(getPlugin(), () -> {
+                    JsonArray packList = getPackList();
+                    for (JsonElement el : packList) {
+                        JsonObject obj = el.getAsJsonObject();
+                        if (obj.get("id").getAsString().equals(id)) {
+                            sender.sendMessage(ChatColor.translateAlternateColorCodes('&', getConfigString("messages.pack_uploaded_success")));
 
-						if (!(packName == null || packName.isJsonNull() || packName.getAsString().isEmpty())) {
-							sender.sendMessage(ChatColor.translateAlternateColorCodes('&', getConfigString("messages.pack_uploaded_success")));
+                            obj.addProperty("owner", ((Player) sender).getUniqueId().toString());
+                            obj.addProperty("pack_url", serverURL + "packs/" + id + ".zip");
+                            obj.addProperty("pack_status", "Pending Approval");
 
-							JsonObject packDataObject = new JsonObject();
-							packDataObject.addProperty("owner", sender.getName());
-							packDataObject.addProperty("token", authToken.get("token").getAsString());
-							packDataObject.addProperty("pack_name", packName.getAsString());
-							packDataObject.addProperty("pack_url", serverURL + "packs/" + authToken.get("token").getAsString() + ".zip");
-							packDataObject.addProperty("pack_status", "Pending Approval");
+                            JsonArray coordinateArray = getCoordinateArray(args);
+                            obj.add("coordinates", coordinateArray);
 
-							JsonArray coordinateArray = getCoordinateArray(args);
-							packDataObject.add("coordinates", coordinateArray);
+                            saveJsonArray(packListPath, packList);
+                            timer.get().cancel();
+                            return;
+                        }
+                    }
 
-							JsonArray packList = getPackList();
-							packList.add(packDataObject);
-							saveJsonArray(packListPath, packList);
+                    if (taskCounter.get() * PERIOD >= TIMEOUT) {
+                        sender.sendMessage(ChatColor.translateAlternateColorCodes('&', getConfigString("messages.pack_upload_timeout")));
 
-							timer.get().cancel();
-						}
+                        File file = new File(packDirectory + id + ".zip");
+                        if (file.exists()) file.delete();
 
-						if (taskCounter.get() * PERIOD >= TIMEOUT) {
-							sender.sendMessage(ChatColor.translateAlternateColorCodes('&', getConfigString("messages.pack_upload_timeout")));
-							new HttpRequest(serverURL + "deletepack?token=" + authToken.get("token").getAsString(), "DELETE").execute();
-							timer.get().cancel();
-						}
-						taskCounter.getAndIncrement();
-					}, 100, PERIOD));
-				}
+                        timer.get().cancel();
+                    }
+                    taskCounter.getAndIncrement();
+                }, 100, PERIOD));
 			}
 		}
 
@@ -101,32 +100,29 @@ public class Commands implements CommandExecutor {
 				}
 				case "reject-or-delete": {
 					if (args.length == 1) {
-						sender.sendMessage(ChatColor.translateAlternateColorCodes('&', getConfigString("messages.no_token_provided")));
+						sender.sendMessage(ChatColor.translateAlternateColorCodes('&', getConfigString("messages.no_id_provided")));
 						return true;
 					} else {
 						JsonArray packList = getPackList();
-						int packIndex = getPackIndexBasedOffToken(packList, args[1]);
+						int packIndex = getPackIndexBasedOffID(packList, args[1]);
 						if (packIndex != -1) {
 							packList.remove(packIndex);
 							saveJsonArray(packListPath, packList);
+                            File file = new File(packDirectory + args[1] + ".zip");
+                            if (file.exists()) file.delete();
 
-							getRegionEntered().forEach((uuid, token) -> {
-								if(token.equals(args[1])) Bukkit.getPlayer(uuid).removeResourcePack(UUID.fromString(args[1]));
+							getRegionEntered().forEach((uuid, id) -> {
+								if(id.equals(args[1])) Bukkit.getPlayer(uuid).removeResourcePack(UUID.fromString(args[1]));
 							});
 
-							JsonObject deleteRequest = new HttpRequest(serverURL + "deletepack?token=" + args[1], "DELETE").execute();
-							if (deleteRequest.get("success").getAsBoolean()) {
-								sender.sendMessage(ChatColor.translateAlternateColorCodes('&', getConfigString("messages.pack_delete_success")));
-							} else {
-								sender.sendMessage(ChatColor.translateAlternateColorCodes('&', getConfigString("messages.pack_delete_error")));
-							}
+                            sender.sendMessage(ChatColor.translateAlternateColorCodes('&', getConfigString("messages.pack_delete_success")));
 						} else {
 							sender.sendMessage(ChatColor.translateAlternateColorCodes('&', getConfigString("messages.no_pack_found")));
 						}
 					}
 					break;
 				}
-				case "packlist": {
+				case "list": {
 					JsonArray packList = getPackList();
 					List<JsonObject> packListPendingApproval = new ArrayList<>();
 					List<JsonObject> packListApproved = new ArrayList<>();
@@ -158,7 +154,7 @@ public class Commands implements CommandExecutor {
 															.replaceAll("#pack_status", elementObject.get("pack_status").getAsString())
 															.replaceAll("#pack_coordinates", elementObject.get("coordinates").getAsJsonArray().get(0).toString().replaceAll(",", ", ") + " - " + elementObject.get("coordinates").getAsJsonArray().get(1).toString().replaceAll(",", ", "))
 															.replaceAll("#pack_url", elementObject.get("pack_url").getAsString())
-															.replaceAll("#pack_token", elementObject.get("token").getAsString())
+															.replaceAll("#pack_id", elementObject.get("id").getAsString())
 											)
 									);
 								});
@@ -169,11 +165,11 @@ public class Commands implements CommandExecutor {
 					}
 				case "accept": {
 					if (args.length == 1) {
-						sender.sendMessage(ChatColor.translateAlternateColorCodes('&', getConfigString("messages.no_token_provided")));
+						sender.sendMessage(ChatColor.translateAlternateColorCodes('&', getConfigString("messages.no_id_provided")));
 						return true;
 					} else {
 						JsonArray packList = getPackList();
-						int packIndex = getPackIndexBasedOffToken(packList, args[1]);
+						int packIndex = getPackIndexBasedOffID(packList, args[1]);
 						if (packIndex != -1) {
 							JsonObject pack = packList.get(packIndex).getAsJsonObject();
 							if("Accepted".equals(pack.get("pack_status").getAsString())) {
