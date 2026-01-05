@@ -4,9 +4,9 @@ messages:
   error_occurred: "&cAn unknown error occurred! Sorry!"
 
   # RegisterArea command messages
-  not_enough_coordinates_specified: "&cYou did not mention all the coordinates"
+  not_enough_coordinates_specified: "&cYou did not specify all the coordinates"
   coordinates_must_be_numbers: "&cAll coordinates provided must be numbers"
-  no_coordinates_specified: "&cYou must input the two coordinates that will be the area that the resource pack will be applied in"
+  no_coordinates_specified: "&cYou must input the two coordinates that will define the area your resource pack will be applied in"
   pack_uploaded_success: "&aYour resource pack was uploaded successfully and is ready to be reviewed!"
   pack_upload_timeout: "&cYou took too long to upload a resource pack! Run the command again if you'd like to upload one anyway."
 
@@ -25,11 +25,13 @@ messages:
   pressable_link_text: "&e[PRESS HERE]"
   link_hover: "&7&oClick to open the pack upload page"
 
-
   # Packlist command messages
   # Use #pack_owner #pack_status #pack_name #pack_url #pack_coordinates in the message for the actual data to display
   packlist_command_response: "&7&m--------------------\n&aName: &f#pack_name\n&aUploaded By: &f#pack_owner\n&aPack Status: &f#pack_status\n&aRegion Coordinates: &f#pack_coordinates\n&aID: &f#pack_id\n&aPack URL: &f#pack_url\n&7&m--------------------"
-  packlist_command_open_url: "&a[OPEN LINK]"
+
+  # Entering Region
+  request_allow_pack: "&7This region has a resource pack available."
+  request_allow_pack_clickable: "&e[PRESS HERE TO APPLY]"
 
 settings:
   # Will not allow players to reject a region's resource pack
