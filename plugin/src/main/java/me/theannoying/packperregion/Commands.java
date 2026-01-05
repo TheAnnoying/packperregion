@@ -19,6 +19,7 @@ import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
+import static me.theannoying.packperregion.EnterRegion.applyPack;
 import static me.theannoying.packperregion.EnterRegion.getRegionEntered;
 import static me.theannoying.packperregion.PackPerRegion.getPlugin;
 import static me.theannoying.packperregion.PackPerRegion.packDirectory;
@@ -98,7 +99,7 @@ public class Commands implements CommandExecutor {
 					sender.sendMessage(ChatColor.translateAlternateColorCodes('&', getConfigString("messages.config_reloaded")));
 					break;
 				}
-				case "reject-or-delete": {
+				case "delete": {
 					if (args.length == 1) {
 						sender.sendMessage(ChatColor.translateAlternateColorCodes('&', getConfigString("messages.no_id_provided")));
 						return true;
@@ -146,17 +147,28 @@ public class Commands implements CommandExecutor {
 							if (!list.isEmpty()) {
 								list.forEach(element -> {
 									JsonObject elementObject = element.getAsJsonObject();
-									sender.sendMessage(
-											ChatColor.translateAlternateColorCodes('&',
-													getConfigString("messages.packlist_command_response")
-															.replaceAll("#pack_owner", elementObject.get("owner").getAsString())
-															.replaceAll("#pack_name", elementObject.get("pack_name").getAsString())
-															.replaceAll("#pack_status", elementObject.get("pack_status").getAsString())
-															.replaceAll("#pack_coordinates", elementObject.get("coordinates").getAsJsonArray().get(0).toString().replaceAll(",", ", ") + " - " + elementObject.get("coordinates").getAsJsonArray().get(1).toString().replaceAll(",", ", "))
-															.replaceAll("#pack_url", elementObject.get("pack_url").getAsString())
-															.replaceAll("#pack_id", elementObject.get("id").getAsString())
-											)
-									);
+
+                                    String url = elementObject.get("pack_url").getAsString();
+                                    String[] parts = getConfigString("messages.packlist_command_response").split("#pack_url", 2);
+
+                                    TextComponent message = new TextComponent(
+                                        ChatColor.translateAlternateColorCodes('&',
+                                            parts[0]
+                                                .replaceAll("#pack_owner", elementObject.get("owner").getAsString())
+                                                .replaceAll("#pack_name", elementObject.get("pack_name").getAsString())
+                                                .replaceAll("#pack_status", elementObject.get("pack_status").getAsString())
+                                                .replaceAll("#pack_coordinates", elementObject.get("coordinates").getAsJsonArray().get(0).toString().replaceAll(",", ", ") + " - " + elementObject.get("coordinates").getAsJsonArray().get(1).toString().replaceAll(",", ", "))
+                                                .replaceAll("#pack_url", elementObject.get("pack_url").getAsString())
+                                                .replaceAll("#pack_id", elementObject.get("id").getAsString())
+                                        )
+                                    );
+
+                                    TextComponent urlComponent = new TextComponent(ChatColor.translateAlternateColorCodes('&', url));
+                                    urlComponent.setClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, url));
+                                    message.addExtra(urlComponent);
+
+                                    if (parts.length > 1) message.addExtra(new TextComponent(ChatColor.translateAlternateColorCodes('&', parts[1])));
+                                    sender.spigot().sendMessage(message);
 								});
 							}
 						});
@@ -185,6 +197,9 @@ public class Commands implements CommandExecutor {
 					}
 					break;
 				}
+                case "applypack": {
+                    applyPack(((Player) sender).getPlayer(), ((Player) sender).getLocation(), true);
+                }
 			}
 		}
 		return true;
