@@ -7,6 +7,7 @@ public final class PackPerRegion extends JavaPlugin {
 	public static PackPerRegion getPlugin() { return plugin; }
 	public final FileConfiguration config = getConfig();
 
+    public static String pluginPath;
     public static String packDirectory;
     public static String packListPath;
 
@@ -14,9 +15,12 @@ public final class PackPerRegion extends JavaPlugin {
 	public void onEnable() {
 		saveDefaultConfig();
 		saveResource("packs/list.json", false);
+        saveResource("web/upload.html", false);
 
         plugin = this;
-        packDirectory = getPlugin().getDataFolder().getAbsolutePath() + "/packs/";
+
+        pluginPath = getPlugin().getDataFolder().getAbsolutePath();
+        packDirectory = pluginPath + "/packs/";
         packListPath = packDirectory + "list.json";
 
         PackServer.startServer(8080);
