@@ -19,8 +19,7 @@ import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
-import static me.theannoying.packperregion.EnterRegion.applyPack;
-import static me.theannoying.packperregion.EnterRegion.getRegionEntered;
+import static me.theannoying.packperregion.EnterRegion.*;
 import static me.theannoying.packperregion.PackPerRegion.getPlugin;
 import static me.theannoying.packperregion.PackPerRegion.packDirectory;
 import static me.theannoying.packperregion.PackPerRegion.packListPath;
@@ -93,7 +92,7 @@ public class Commands implements CommandExecutor {
 		if (command.getName().equalsIgnoreCase("packperregion")) {
 			if (args.length == 0) return false;
 
-			switch (args[0]) {
+			switch (args[0].toLowerCase()) {
 				case "reload": {
 					getPlugin().reloadConfig();
 					sender.sendMessage(ChatColor.translateAlternateColorCodes('&', getConfigString("messages.config_reloaded")));
@@ -112,7 +111,7 @@ public class Commands implements CommandExecutor {
                             File file = new File(packDirectory + args[1] + ".zip");
                             if (file.exists()) file.delete();
 
-							getRegionEntered().forEach((uuid, id) -> {
+                            resourcePackApplied.forEach((uuid, id) -> {
 								if(id.equals(args[1])) Bukkit.getPlayer(uuid).removeResourcePack(UUID.fromString(args[1]));
 							});
 
@@ -174,7 +173,7 @@ public class Commands implements CommandExecutor {
 						});
 					}
 					break;
-					}
+                }
 				case "accept": {
 					if (args.length == 1) {
 						sender.sendMessage(ChatColor.translateAlternateColorCodes('&', getConfigString("messages.no_id_provided")));
