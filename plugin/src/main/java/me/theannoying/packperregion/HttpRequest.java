@@ -1,12 +1,10 @@
 package me.theannoying.packperregion;
 
-import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 
-import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.Scanner;
@@ -51,9 +49,5 @@ public class HttpRequest {
 		}
 
 		return null;
-	}
-
-	public JsonObject execute() {
-		return this.execute(null);
 	}
 }
