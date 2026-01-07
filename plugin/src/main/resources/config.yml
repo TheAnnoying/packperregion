@@ -32,10 +32,11 @@ messages:
   # Entering Region
   request_allow_pack: "&7This region has a resource pack available."
   request_allow_pack_clickable: "&e[PRESS HERE TO APPLY]"
+  unable_to_apply_pack: "&cUnable to apply resource pack. Perhaps you're not within a resource pack region?"
 
 settings:
+  # This port is used for exposing the region resource packs and upload web interface
+  port: 8080
   # Will not allow players to reject a region's resource pack
   make_region_packs_required: false
-  # Players might disable the server resource pack and region specific resource packs will not work, choose whether to send them a warning about it
-  send_warning_on_region_enter: true
-  send_warning_on_join: false
+  pack_file_size_limit_mb: 40
