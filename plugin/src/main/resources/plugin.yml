@@ -1,7 +1,7 @@
 name: PackPerRegion
 version: '${project.version}'
 main: me.theannoying.packperregion.PackPerRegion
-api-version: '1.21'
+api-version: '1.20.4'
 authors: [ TheAnnoying ]
 description: Pack Per Region is a plugin that allows server players to register regions in which a resource pack will be applied
 log-prefix: PackPerRegion
