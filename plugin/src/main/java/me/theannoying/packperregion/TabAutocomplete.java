@@ -1,16 +1,12 @@
 package me.theannoying.packperregion;
 
 import com.google.gson.JsonArray;
-import org.bukkit.Location;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabCompleter;
-import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
-import java.util.Objects;
 
 import static me.theannoying.packperregion.Util.getPackList;
 
