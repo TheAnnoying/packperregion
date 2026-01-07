@@ -57,24 +57,34 @@ public class PackServer {
         app.post("/uploadpack", ctx -> {
             String id = ctx.queryParam("id");
             File file = new File(packDirectory + id + ".zip");
+            UploadedFile uploadedFile = ctx.uploadedFile("pack");
 
-            if (!file.exists()) {
-                UploadedFile uploadedFile = ctx.uploadedFile("pack");
-                if (uploadedFile != null) {
-                    Files.copy(uploadedFile.content(), file.toPath(), StandardCopyOption.REPLACE_EXISTING);
+             if (uploadedFile == null) {
+                 ctx.status(413).json(Map.of("success", false, "error", "No file"));
+                 return;
+             }
 
-                    JsonArray packList = getPackList();
-                    JsonObject packDataObject = new JsonObject();
-                    packDataObject.addProperty("id", id);
-                    packDataObject.addProperty("pack_name", uploadedFile.filename());
-
-                    packList.add(packDataObject);
-                    saveJsonArray(packListPath, packList);
-                    ctx.json(Collections.singletonMap("success", true));
-                }
-            } else {
-                ctx.json(Collections.singletonMap("success", false));
+            if (uploadedFile.size() > (long) getConfigInt("settings.pack_file_size_limit_mb") * 1024 * 1024 ) {
+                ctx.status(413).json(Map.of("success", false, "error", "File too large"));
+                return;
             }
+
+            if(file.exists()) {
+                ctx.json(Map.of("success", false));
+                return;
+            }
+
+            Files.copy(uploadedFile.content(), file.toPath(), StandardCopyOption.REPLACE_EXISTING);
+
+            JsonArray packList = getPackList();
+            JsonObject packDataObject = new JsonObject();
+            packDataObject.addProperty("id", id);
+            packDataObject.addProperty("pack_name", uploadedFile.filename());
+
+            packList.add(packDataObject);
+            saveJsonArray(packListPath, packList);
+
+            ctx.json(Map.of("success", true));
         });
     }
 }
