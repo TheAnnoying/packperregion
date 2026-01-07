@@ -11,7 +11,7 @@
 
     <name>PackPerRegion</name>
 
-    <description>Pack Per Region is a plugin that allows server players to register regions in which a resource pack will be applied</description>
+    <description>Allow server players to register regions in which their custom resource pack will be applied.</description>
     <properties>
         <java.version>20</java.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -78,7 +78,7 @@
         <dependency>
             <groupId>org.spigotmc</groupId>
             <artifactId>spigot-api</artifactId>
-            <version>1.21.11-R0.1-SNAPSHOT</version>
+            <version>1.20.4-R0.1-SNAPSHOT</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
