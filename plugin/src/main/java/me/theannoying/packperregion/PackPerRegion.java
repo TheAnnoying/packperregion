@@ -1,6 +1,7 @@
 package me.theannoying.packperregion;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
+import static me.theannoying.packperregion.Util.*;
 
 public final class PackPerRegion extends JavaPlugin {
 	private static PackPerRegion plugin;
@@ -23,7 +24,7 @@ public final class PackPerRegion extends JavaPlugin {
         packDirectory = pluginPath + "/packs/";
         packListPath = packDirectory + "list.json";
 
-        PackServer.startServer(8080);
+        PackServer.startServer(getConfigInt("settings.port"));
         getServer().getLogger().info("Enabling...");
 
 		getCommand("registerarea").setExecutor(new Commands());

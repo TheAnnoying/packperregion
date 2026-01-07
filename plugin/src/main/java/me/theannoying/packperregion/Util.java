@@ -9,10 +9,6 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.util.Base64;
-import java.util.Properties;
 
 import static me.theannoying.packperregion.PackPerRegion.getPlugin;
 
@@ -37,6 +33,8 @@ public class Util {
 	public static Boolean getConfigBool(String path) {
 		return getPlugin().getConfig().getBoolean(path);
 	}
+
+    public static int getConfigInt(String path) { return getPlugin().getConfig().getInt(path); }
 
 	public static JsonObject getJsonObject(String path) {
 		JsonObject object = null;
@@ -76,19 +74,7 @@ public class Util {
 		}
 	}
 
-	public static String zipToDataURL(String path) {
-		String dataURL = null;
-		try {
-			byte[] zipData = Files.readAllBytes(Paths.get(path));
-			String base64Data = Base64.getEncoder().encodeToString(zipData);
-			dataURL = "data:application/zip;base64," + base64Data;
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		return dataURL;
-	}
-
-	public static JsonArray getPackList() {
+    public static JsonArray getPackList() {
 		String path = getPlugin().getDataFolder().getAbsolutePath() + "/packs/list.json";
 		if(!(new File(path)).exists()) getPlugin().saveResource("packs/list.json", false);
 		return getJsonArray(path);
