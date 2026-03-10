@@ -5,6 +5,8 @@ import io.javalin.http.UploadedFile;
 import com.google.gson.*;
 import io.javalin.http.staticfiles.Location;
 import io.javalin.json.JsonMapper;
+import io.javalin.plugin.bundled.CorsPluginConfig;
+import org.bukkit.ChatColor;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.*;
@@ -35,7 +37,7 @@ public class PackServer {
         Javalin app = Javalin.create(config -> {
             config.jsonMapper(gsonMapper);
             config.bundledPlugins.enableCors(cors -> {
-                cors.addRule(it -> it.anyHost());
+                cors.addRule(CorsPluginConfig.CorsRule::anyHost);
             });
 
             config.staticFiles.add(staticFiles -> {
@@ -74,17 +76,21 @@ public class PackServer {
                 return;
             }
 
-            Files.copy(uploadedFile.content(), file.toPath(), StandardCopyOption.REPLACE_EXISTING);
-
             JsonArray packList = getPackList();
-            JsonObject packDataObject = new JsonObject();
-            packDataObject.addProperty("id", id);
-            packDataObject.addProperty("pack_name", uploadedFile.filename());
+            for (JsonElement el : packList) {
+                JsonObject obj = el.getAsJsonObject();
+                if (obj.get("id").getAsString().equals(id) && !obj.has("pack_name")) {
+                    Files.copy(uploadedFile.content(), file.toPath(), StandardCopyOption.REPLACE_EXISTING);
 
-            packList.add(packDataObject);
-            saveJsonArray(packListPath, packList);
+                    obj.addProperty("pack_name", uploadedFile.filename());
+                    saveJsonArray(packListPath, packList);
 
-            ctx.json(Map.of("success", true));
+                    ctx.json(Map.of("success", true));
+                    return;
+                }
+            }
+
+            ctx.json(Map.of("success", false));
         });
     }
 }
