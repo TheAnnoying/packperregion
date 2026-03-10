@@ -15,6 +15,7 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import java.util.HashMap;
 import java.util.UUID;
 
+import static me.theannoying.packperregion.PackPerRegion.serverURL;
 import static me.theannoying.packperregion.Util.*;
 
 public class EnterRegion implements Listener {
@@ -35,7 +36,7 @@ public class EnterRegion implements Listener {
                     regionEntered.put(player.getUniqueId(), id);
                     if(getConfigBool("settings.make_region_packs_required") || force) {
                         resourcePackApplied.put(player.getUniqueId(), id);
-                        player.addResourcePack(UUID.fromString(pack.getAsJsonObject().get("id").getAsString()), pack.getAsJsonObject().get("pack_url").getAsString(), null, null, getConfigBool("settings.make_region_packs_required"));
+                        player.addResourcePack(UUID.fromString(pack.getAsJsonObject().get("id").getAsString()), serverURL + "packs/" + pack.getAsJsonObject().get("id").getAsString() + ".zip", null, null, getConfigBool("settings.make_region_packs_required"));
                     } else {
                         TextComponent component = new TextComponent(ChatColor.translateAlternateColorCodes('&', getConfigString("messages.request_allow_pack_clickable")));
                         component.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/packperregion applypack"));
