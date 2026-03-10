@@ -13,6 +13,7 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitTask;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 import java.util.*;
@@ -20,19 +21,16 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
 import static me.theannoying.packperregion.EnterRegion.*;
-import static me.theannoying.packperregion.PackPerRegion.getPlugin;
-import static me.theannoying.packperregion.PackPerRegion.packDirectory;
-import static me.theannoying.packperregion.PackPerRegion.packListPath;
+import static me.theannoying.packperregion.PackPerRegion.*;
 import static me.theannoying.packperregion.Util.*;
 
 public class Commands implements CommandExecutor {
-	private final String serverURL = "http://localhost:8080/";
 	AtomicInteger taskCounter = new AtomicInteger();
 	final int PERIOD = 100;
 	final int TIMEOUT = 60 * PERIOD;
 
 	@Override
-	public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
+	public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
 		if (!(sender instanceof Player)) {
 			sender.sendMessage(ChatColor.RED + "A player is required to run this command!");
 			return true;
@@ -49,7 +47,19 @@ public class Commands implements CommandExecutor {
 				String id = UUID.randomUUID().toString();
                 TextComponent component = new TextComponent(ChatColor.translateAlternateColorCodes('&', getConfigString("messages.pressable_link_text")));
 
-                component.setClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, "http://localhost:5173/" + "?uuid=" + ((Player) sender).getUniqueId() + "&id=" + id));
+                JsonArray packList = getPackList();
+                JsonObject packDataObject = new JsonObject();
+                packDataObject.addProperty("id", id);
+                packDataObject.addProperty("owner", ((Player) sender).getUniqueId().toString());
+                packDataObject.addProperty("pack_status", "Pending Upload");
+
+                JsonArray coordinateArray = getCoordinateArray(args);
+                packDataObject.add("coordinates", coordinateArray);
+
+                packList.add(packDataObject);
+                saveJsonArray(packListPath, packList);
+
+                component.setClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, serverURL + "web/upload.html?uuid=" + ((Player) sender).getUniqueId() + "&id=" + id));
                 component.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new Text(ChatColor.translateAlternateColorCodes('&', getConfigString("messages.link_hover")))));
 
                 sender.sendMessage(ChatColor.translateAlternateColorCodes('&', getConfigString("messages.pack_upload_site")));
@@ -57,20 +67,11 @@ public class Commands implements CommandExecutor {
 
                 AtomicReference<BukkitTask> timer = new AtomicReference<>();
                 timer.set(Bukkit.getScheduler().runTaskTimer(getPlugin(), () -> {
-                    JsonArray packList = getPackList();
-                    for (JsonElement el : packList) {
+                    JsonArray updatedPackList = getPackList();
+                    for (JsonElement el : updatedPackList) {
                         JsonObject obj = el.getAsJsonObject();
-                        if (obj.get("id").getAsString().equals(id)) {
+                        if (obj.get("id").getAsString().equals(id) && obj.has("pack_name")) {
                             sender.sendMessage(ChatColor.translateAlternateColorCodes('&', getConfigString("messages.pack_uploaded_success")));
-
-                            obj.addProperty("owner", ((Player) sender).getUniqueId().toString());
-                            obj.addProperty("pack_url", serverURL + "packs/" + id + ".zip");
-                            obj.addProperty("pack_status", "Pending Approval");
-
-                            JsonArray coordinateArray = getCoordinateArray(args);
-                            obj.add("coordinates", coordinateArray);
-
-                            saveJsonArray(packListPath, packList);
                             timer.get().cancel();
                             return;
                         }
@@ -81,6 +82,8 @@ public class Commands implements CommandExecutor {
 
                         File file = new File(packDirectory + id + ".zip");
                         if (file.exists()) file.delete();
+                        int packIndex = getPackIndexBasedOffID(packList, id);
+                        if (packIndex != -1) packList.remove(packIndex);
 
                         timer.get().cancel();
                     }
@@ -112,7 +115,7 @@ public class Commands implements CommandExecutor {
                             if (file.exists()) file.delete();
 
                             resourcePackApplied.forEach((uuid, id) -> {
-								if(id.equals(args[1])) Bukkit.getPlayer(uuid).removeResourcePack(UUID.fromString(args[1]));
+								if(id.equals(args[1])) Objects.requireNonNull(Bukkit.getPlayer(uuid)).removeResourcePack(UUID.fromString(args[1]));
 							});
 
                             sender.sendMessage(ChatColor.translateAlternateColorCodes('&', getConfigString("messages.pack_delete_success")));
@@ -130,7 +133,7 @@ public class Commands implements CommandExecutor {
 					packList.forEach(element -> {
 						Map<String, List<JsonObject>> packStatuses = new HashMap<>();
 						packStatuses.put("Pending Approval", packListPendingApproval);
-						packStatuses.put("Accepted", packListApproved);
+						packStatuses.put("Approved", packListApproved);
 
 						packStatuses.get(element.getAsJsonObject().get("pack_status").getAsString()).add(element.getAsJsonObject());
 					});
@@ -147,18 +150,19 @@ public class Commands implements CommandExecutor {
 								list.forEach(element -> {
 									JsonObject elementObject = element.getAsJsonObject();
 
-                                    String url = elementObject.get("pack_url").getAsString();
+                                    String packID = elementObject.get("id").getAsString();
+                                    String url = serverURL + "packs/" + packID + ".zip";
                                     String[] parts = getConfigString("messages.packlist_command_response").split("#pack_url", 2);
 
                                     TextComponent message = new TextComponent(
                                         ChatColor.translateAlternateColorCodes('&',
                                             parts[0]
                                                 .replaceAll("#pack_owner", elementObject.get("owner").getAsString())
-                                                .replaceAll("#pack_name", elementObject.get("pack_name").getAsString())
+                                                .replaceAll("#pack_name", elementObject.has("pack_name") ? elementObject.get("pack_name").getAsString() : getConfigString("messages.pack_not_uploaded_yet"))
                                                 .replaceAll("#pack_status", elementObject.get("pack_status").getAsString())
                                                 .replaceAll("#pack_coordinates", elementObject.get("coordinates").getAsJsonArray().get(0).toString().replaceAll(",", ", ") + " - " + elementObject.get("coordinates").getAsJsonArray().get(1).toString().replaceAll(",", ", "))
-                                                .replaceAll("#pack_url", elementObject.get("pack_url").getAsString())
-                                                .replaceAll("#pack_id", elementObject.get("id").getAsString())
+                                                .replaceAll("#pack_url", elementObject.has("pack_name") ? url : getConfigString("messages.pack_not_uploaded_yet"))
+                                                .replaceAll("#pack_id", packID)
                                         )
                                     );
 
