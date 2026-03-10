@@ -28,11 +28,17 @@ messages:
   # Packlist command messages
   # Use #pack_owner #pack_status #pack_name #pack_url #pack_coordinates in the message for the actual data to display
   packlist_command_response: "&7&m--------------------\n&aName: &f#pack_name\n&aUploaded By: &f#pack_owner\n&aPack Status: &f#pack_status\n&aRegion Coordinates: &f#pack_coordinates\n&aID: &f#pack_id\n&aPack URL: &f#pack_url\n&7&m--------------------"
+  pack_not_uploaded_yet: "Pack not uploaded yet"
 
   # Entering Region
   request_allow_pack: "&7This region has a resource pack available."
   request_allow_pack_clickable: "&e[PRESS HERE TO APPLY]"
   unable_to_apply_pack: "&cUnable to apply resource pack. Perhaps you're not within a resource pack region?"
+
+  # Resource Pack States
+  pending_upload: "Pending Upload"
+  pending_approval: "Pending Approval"
+  accepted: "Approved"
 
 settings:
   # This port is used for exposing the region resource packs and upload web interface
