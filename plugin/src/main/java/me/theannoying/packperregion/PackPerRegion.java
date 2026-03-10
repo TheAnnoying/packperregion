@@ -1,6 +1,13 @@
 package me.theannoying.packperregion;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
+
+import java.io.IOException;
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+
 import static me.theannoying.packperregion.Util.*;
 
 public final class PackPerRegion extends JavaPlugin {
@@ -11,6 +18,7 @@ public final class PackPerRegion extends JavaPlugin {
     public static String pluginPath;
     public static String packDirectory;
     public static String packListPath;
+    public static String serverURL;
 
 	@Override
 	public void onEnable() {
@@ -23,6 +31,16 @@ public final class PackPerRegion extends JavaPlugin {
         pluginPath = getPlugin().getDataFolder().getAbsolutePath();
         packDirectory = pluginPath + "/packs/";
         packListPath = packDirectory + "list.json";
+
+		try {
+			HttpClient client = HttpClient.newHttpClient();
+			HttpRequest request = HttpRequest.newBuilder().uri(URI.create("http://checkip.amazonaws.com")).GET().build();
+
+			HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+			serverURL = "https://" + response.body().trim() + ":" + getConfigInt("settings.port") + "/";
+		} catch (IOException | InterruptedException e) {
+			throw new RuntimeException(e);
+		}
 
         PackServer.startServer(getConfigInt("settings.port"));
         getServer().getLogger().info("Enabling...");
